@@ -1,51 +1,101 @@
+import { useEffect, useState } from 'react';
 import { Table, Button } from 'rsuite';
+import { manutencoesDelete, manutencoesGet } from '../../services/Manutencoes';
 
 const { Column, HeaderCell, Cell } = Table;
 
+interface IManutencoes {
+  cod_manutencao: number;
+  patrimonio: {
+    cod_patrimonio: number;
+    tipo_patrimonio: {
+      id_tipo: number;
+      nome: string;
+      categoria: string;
+    };
+    nome_patrimonio: string;
+    qtde: number;
+    localizacao: {
+      id_localizacao: number;
+      sala: string;
+      prateleira: string;
+    };
+  };
+  data_manutencao: string;
+}
+
 export function Manutencao() {
+  const [manutencoes, setManutencoes] = useState<IManutencoes[]>([]);
+
+  useEffect(() => {
+    loadApiData();
+  }, [manutencoes]);
+
+  async function loadApiData() {
+    const response = await manutencoesGet();
+
+    setManutencoes(response);
+  }
+
   return (
     <div
       style={{
-        padding: 4,
+        padding: 10,
       }}
     >
-      <Table
-        height={400}
-        data={[{ id: 1, firstName: 'batata', lastName: 'quente' }]}
-        onRowClick={(rowData) => {
-          console.log(rowData);
-        }}
-      >
-        <Column width={60} align="center" fixed>
-          <HeaderCell>Id</HeaderCell>
-          <Cell dataKey="id" />
-        </Column>
+      <div>
+        <Table
+          height={400}
+          data={manutencoes}
+          onRowClick={(rowData) => {
+            console.log(rowData);
+          }}
+        >
+          <Column width={80} align="center" fixed>
+            <HeaderCell>Código</HeaderCell>
+            <Cell dataKey="cod_manutencao" />
+          </Column>
 
-        <Column width={150}>
-          <HeaderCell>First Name</HeaderCell>
-          <Cell dataKey="firstName" />
-        </Column>
+          <Column width={150}>
+            <HeaderCell>Patrimonio</HeaderCell>
+            <Cell dataKey="patrimonio.nome_patrimonio" />
+          </Column>
 
-        <Column width={150}>
-          <HeaderCell>Last Name</HeaderCell>
-          <Cell dataKey="lastName" />
-        </Column>
+          <Column width={150}>
+            <HeaderCell>Data manutenção</HeaderCell>
+            <Cell dataKey="data_manutencao" />
+          </Column>
+          
+          <Column width={80} fixed="right">
+            <HeaderCell>...</HeaderCell>
 
-        <Column width={80} fixed="right">
-          <HeaderCell>...</HeaderCell>
+            <Cell style={{ padding: '6px' }}>
+              {(rowData) => (
+                <Button
+                  appearance="link"
+                  onClick={() => alert(`id:${rowData.cod_manutencao}`)}
+                >
+                  Editar
+                </Button>
+              )}
+            </Cell>
+          </Column>
+          <Column width={80} fixed="right">
+            <HeaderCell>...</HeaderCell>
 
-          <Cell style={{ padding: '6px' }}>
-            {(rowData) => (
-              <Button
-                appearance="link"
-                onClick={() => alert(`id:${rowData.id}`)}
-              >
-                Edit
-              </Button>
-            )}
-          </Cell>
-        </Column>
-      </Table>
+            <Cell style={{ padding: '6px' }}>
+              {(rowData) => (
+                <Button
+                  appearance="link"
+                  onClick={() => manutencoesDelete(rowData.cod_manutencao)}
+                >
+                  Deletar
+                </Button>
+              )}
+            </Cell>
+          </Column>
+        </Table>
+      </div>
 
       <Button>Criar Novo</Button>
     </div>

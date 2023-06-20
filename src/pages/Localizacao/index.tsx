@@ -1,51 +1,87 @@
+import { useEffect, useState } from 'react';
 import { Table, Button } from 'rsuite';
+import { localizacoesDelete, localizacoesGet } from '../../services/Localizacoes';
 
 const { Column, HeaderCell, Cell } = Table;
 
+interface ILocalizacoes {
+    id_localizacao: number;
+    sala: string;
+    prateleira: string;
+}
+
 export function Localizacao() {
+  const [localizacoes, setLocalizacoes] = useState<ILocalizacoes[]>([]);
+
+  useEffect(() => {
+    loadApiData();
+  }, [localizacoes]);
+
+  async function loadApiData() {
+    const response = await localizacoesGet();
+
+    setLocalizacoes(response);
+  }
+
   return (
     <div
       style={{
-        padding: 4,
+        padding: 10,
       }}
     >
-      <Table
-        height={400}
-        data={[{ id: 1, firstName: 'batata', lastName: 'quente' }]}
-        onRowClick={(rowData) => {
-          console.log(rowData);
-        }}
-      >
-        <Column width={60} align="center" fixed>
-          <HeaderCell>Id</HeaderCell>
-          <Cell dataKey="id" />
-        </Column>
+      <div>
+        <Table
+          height={400}
+          data={localizacoes}
+          onRowClick={(rowData) => {
+            console.log(rowData);
+          }}
+        >
+          <Column width={80} align="center" fixed>
+            <HeaderCell>Código</HeaderCell>
+            <Cell dataKey="id_localizacao" />
+          </Column>
 
-        <Column width={150}>
-          <HeaderCell>First Name</HeaderCell>
-          <Cell dataKey="firstName" />
-        </Column>
+          <Column width={150}>
+            <HeaderCell>Sala</HeaderCell>
+            <Cell dataKey="sala" />
+          </Column>
 
-        <Column width={150}>
-          <HeaderCell>Last Name</HeaderCell>
-          <Cell dataKey="lastName" />
-        </Column>
+          <Column width={150}>
+            <HeaderCell>Prateleira</HeaderCell>
+            <Cell dataKey="prateleira" />
+          </Column>
 
-        <Column width={80} fixed="right">
-          <HeaderCell>...</HeaderCell>
+          <Column width={80} fixed="right">
+            <HeaderCell>...</HeaderCell>
 
-          <Cell style={{ padding: '6px' }}>
-            {(rowData) => (
-              <Button
-                appearance="link"
-                onClick={() => alert(`id:${rowData.id}`)}
-              >
-                Edit
-              </Button>
-            )}
-          </Cell>
-        </Column>
-      </Table>
+            <Cell style={{ padding: '6px' }}>
+              {(rowData) => (
+                <Button
+                  appearance="link"
+                  onClick={() => alert(`id:${rowData.id_localizacao}`)}
+                >
+                  Editar
+                </Button>
+              )}
+            </Cell>
+          </Column>
+          <Column width={80} fixed="right">
+            <HeaderCell>...</HeaderCell>
+
+            <Cell style={{ padding: '6px' }}>
+              {(rowData) => (
+                <Button
+                  appearance="link"
+                  onClick={() => localizacoesDelete(rowData.id_localizacao)}
+                >
+                  Deletar
+                </Button>
+              )}
+            </Cell>
+          </Column>
+        </Table>
+      </div>
 
       <Button>Criar Novo</Button>
     </div>
