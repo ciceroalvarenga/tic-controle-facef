@@ -47,7 +47,7 @@ export function Localizacao() {
         </Column>
       </Table>
 
-      <Button>Criar Novo</Button>
+      <Button appearance="primary">Criar Novo</Button>
     </div>
   );
 }
