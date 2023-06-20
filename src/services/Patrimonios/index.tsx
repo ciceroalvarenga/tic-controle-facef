@@ -11,6 +11,28 @@ async function patrimoniosGet() {
   return result;
 }
 
+async function patrimoniosPut(id: number) {
+  const result = await api
+    .get(`/patrimonio/${id}`)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => console.log(err));
+
+  return result;
+}
+
+async function patrimoniosPost(id: number) {
+  const result = await api
+    .get(`/patrimonio/${id}`)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => console.log(err));
+
+  return result;
+}
+
 async function patrimoniosDelete(id: number) {
   const result = await api
     .delete(`/patrimonio/${id}`)

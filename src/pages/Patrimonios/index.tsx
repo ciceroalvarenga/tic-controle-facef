@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Button } from 'rsuite';
+import { Table, Button, Modal, Input } from 'rsuite';
 import { patrimoniosDelete, patrimoniosGet } from '../../services/Patrimonios';
 
 const { Column, HeaderCell, Cell } = Table;
@@ -22,6 +22,12 @@ interface IPatrimonios {
 
 export function Patrimonios() {
   const [patrimonios, setPatrimonios] = useState<IPatrimonios[]>([]);
+  const [openModalCriar, setOpenModalCriar] = useState(false);
+  const [openModalEditar, setOpenModalEditar] = useState(false);
+  const handleOpen = () => setOpenModalCriar(true);
+  const handleClose = () => setOpenModalCriar(false);
+  const handleOpenModalEditar = () => setOpenModalEditar(true);
+  const handleCloseModalEditar = () => setOpenModalEditar(false);
 
   useEffect(() => {
     loadApiData();
@@ -39,6 +45,52 @@ export function Patrimonios() {
         padding: 10,
       }}
     >
+      <Modal open={openModalCriar} onClose={handleClose}>
+        <Modal.Header>
+          <Modal.Title>Criar Patrimonio</Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+        >
+          <Input placeholder="Código Patrimonio" />
+          <Input placeholder="Tipo Patrimonio" />
+          <Input placeholder="Nome" />
+          <Input placeholder="Quantidade" />
+          <Input placeholder="Localização" />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleClose} appearance="primary">
+            Confirmar
+          </Button>
+          <Button onClick={handleClose} appearance="ghost">
+            Cancelar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal open={openModalEditar} onClose={handleCloseModalEditar}>
+        <Modal.Header>
+          <Modal.Title>Editar Patrimonio</Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+        >
+          <Input placeholder="Código Patrimonio" />
+          <Input placeholder="Tipo Patrimonio" />
+          <Input placeholder="Nome" />
+          <Input placeholder="Quantidade" />
+          <Input placeholder="Localização" />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleClose} appearance="primary">
+            Confirmar
+          </Button>
+          <Button onClick={handleClose} appearance="ghost">
+            Cancelar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <div>
         <Table
           height={400}
@@ -75,10 +127,7 @@ export function Patrimonios() {
 
             <Cell style={{ padding: '6px' }}>
               {(rowData) => (
-                <Button
-                  appearance="link"
-                  onClick={() => alert(`id:${rowData.id}`)}
-                >
+                <Button appearance="link" onClick={handleOpenModalEditar}>
                   Editar
                 </Button>
               )}
@@ -101,7 +150,9 @@ export function Patrimonios() {
         </Table>
       </div>
 
-      <Button>Criar Novo</Button>
+      <Button appearance="primary" onClick={handleOpen}>
+        Criar Novo
+      </Button>
     </div>
   );
 }
