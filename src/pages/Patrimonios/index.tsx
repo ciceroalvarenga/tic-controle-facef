@@ -38,10 +38,19 @@ interface ILocalizacoes {
 }
 
 export function Patrimonios() {
+  //get
   const [patrimonios, setPatrimonios] = useState<IPatrimonios[]>([]);
+
+  //get
   const [tipo, setTipo] = useState<ITipoPatrimonio[]>([]);
+
+  //get
   const [localizacao, setLocalizacao] = useState<ILocalizacoes[]>([]);
+
+  //SelectID
   const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  //Selectlocal
   const [selectedIdLocal, setSelectedIdLocal] = useState<number | null>(null);
 
   const [codigo, setCodigo] = useState('');
@@ -50,8 +59,12 @@ export function Patrimonios() {
 
   const [openModalCriar, setOpenModalCriar] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
+
+  //modal criar
   const handleOpen = () => setOpenModalCriar(true);
   const handleClose = () => setOpenModalCriar(false);
+
+  //modal editar
   const handleOpenModalEditar = () => setOpenModalEditar(true);
   const handleCloseModalEditar = () => setOpenModalEditar(false);
 
@@ -110,6 +123,7 @@ export function Patrimonios() {
         padding: 10,
       }}
     >
+      {/* Modal Criar */}
       <Modal open={openModalCriar} onClose={handleClose}>
         <Modal.Header>
           <Modal.Title>Criar Patrimonio</Modal.Title>
@@ -156,6 +170,8 @@ export function Patrimonios() {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal Editar */}
 
       <Modal open={openModalEditar} onClose={handleCloseModalEditar}>
         <Modal.Header>
