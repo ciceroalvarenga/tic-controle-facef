@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Table, Button, Modal, Input } from 'rsuite';
-import { patrimoniosDelete, patrimoniosGet } from '../../services/Patrimonios';
+import { Table, Button, Modal, Input, SelectPicker } from 'rsuite';
+import {
+  patrimoniosDelete,
+  patrimoniosGet,
+  patrimoniosPost,
+} from '../../services/Patrimonios';
+import { tipopatrimonioGet } from '../../services/TiposPatrimonios';
+import { localizacoesGet } from '../../services/Localizacoes';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -19,9 +25,29 @@ interface IPatrimonios {
     prateleira: string;
   };
 }
+interface ITipoPatrimonio {
+  id_tipo: number;
+  nome: string;
+  categoria: string;
+}
+
+interface ILocalizacoes {
+  id_localizacao: number;
+  sala: string;
+  prateleira: string;
+}
 
 export function Patrimonios() {
   const [patrimonios, setPatrimonios] = useState<IPatrimonios[]>([]);
+  const [tipo, setTipo] = useState<ITipoPatrimonio[]>([]);
+  const [localizacao, setLocalizacao] = useState<ILocalizacoes[]>([]);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedIdLocal, setSelectedIdLocal] = useState<number | null>(null);
+
+  const [codigo, setCodigo] = useState('');
+  const [nome, setNome] = useState('');
+  const [quantidade, setQuantidade] = useState('');
+
   const [openModalCriar, setOpenModalCriar] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
   const handleOpen = () => setOpenModalCriar(true);
@@ -31,12 +57,51 @@ export function Patrimonios() {
 
   useEffect(() => {
     loadApiData();
+    loadApiDataTipo();
+    loadApiDataLocalizacoes();
   }, [patrimonios]);
 
   async function loadApiData() {
     const response = await patrimoniosGet();
 
     setPatrimonios(response);
+  }
+  async function loadApiDataTipo() {
+    const response = await tipopatrimonioGet();
+
+    setTipo(response);
+  }
+
+  async function loadApiDataLocalizacoes() {
+    const response = await localizacoesGet();
+
+    setLocalizacao(response);
+  }
+
+  const handleSelectChange = (value: number | null) => {
+    setSelectedId(value);
+  };
+
+  const handleSelectChangeLocal = (value: number | null) => {
+    setSelectedIdLocal(value);
+  };
+
+  async function handlePost() {
+    const params = {
+      cod_patrimonio: codigo,
+      tipo_patrimonio: selectedId,
+      nome_patrimonio: nome,
+      qtde: quantidade,
+      localizacao: selectedIdLocal,
+      id_usuario: 1,
+    };
+
+    const response = await patrimoniosPost(params);
+
+    //@ts-ignore
+    if (response.status === 200) {
+      setOpenModalCriar(false);
+    }
   }
 
   return (
@@ -52,14 +117,38 @@ export function Patrimonios() {
         <Modal.Body
           style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
         >
-          <Input placeholder="Código Patrimonio" />
-          <Input placeholder="Tipo Patrimonio" />
-          <Input placeholder="Nome" />
-          <Input placeholder="Quantidade" />
-          <Input placeholder="Localização" />
+          <Input
+            type="number"
+            placeholder="Código Patrimonio"
+            onChange={(e) => setCodigo(e)}
+          />
+          <SelectPicker
+            data={tipo}
+            value={selectedId}
+            onChange={handleSelectChange}
+            labelKey="nome"
+            valueKey="id_tipo"
+            placeholder="Tipo Patrimonio"
+            style={{ width: 224 }}
+          />
+          <Input placeholder="Nome" onChange={(e) => setNome(e)} />
+          <Input
+            type="number"
+            placeholder="Quantidade"
+            onChange={(e) => setQuantidade(e)}
+          />
+          <SelectPicker
+            data={localizacao}
+            value={selectedIdLocal}
+            onChange={handleSelectChangeLocal}
+            labelKey="sala"
+            valueKey="id_localizacao"
+            placeholder="Localização"
+            style={{ width: 224 }}
+          />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={handlePost} appearance="primary">
             Confirmar
           </Button>
           <Button onClick={handleClose} appearance="ghost">

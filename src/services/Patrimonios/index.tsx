@@ -11,9 +11,9 @@ async function patrimoniosGet() {
   return result;
 }
 
-async function patrimoniosPut(id: number) {
+async function patrimoniosPut(id: number, params: any) {
   const result = await api
-    .get(`/patrimonio/${id}`)
+    .get(`/patrimonio/${id}`, params)
     .then((res) => {
       return res.data;
     })
@@ -22,11 +22,11 @@ async function patrimoniosPut(id: number) {
   return result;
 }
 
-async function patrimoniosPost(id: number) {
+async function patrimoniosPost(params: any) {
   const result = await api
-    .get(`/patrimonio/${id}`)
+    .post(`/patrimonio`, params)
     .then((res) => {
-      return res.data;
+      return res;
     })
     .catch((err) => console.log(err));
 
@@ -44,4 +44,4 @@ async function patrimoniosDelete(id: number) {
   return result;
 }
 
-export { patrimoniosGet, patrimoniosDelete };
+export { patrimoniosGet, patrimoniosDelete, patrimoniosPost, patrimoniosPut };
