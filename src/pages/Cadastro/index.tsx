@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Button, Input } from 'rsuite';
 import { useNavigate } from 'react-router-dom';
-import { loginVerification } from '../../services/Login';
+import { cadastroApi } from '../../services/Login';
 
-export function Login() {
+export function Cadastro() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
@@ -14,13 +14,12 @@ export function Login() {
       email,
       senha,
     };
-    const response = await loginVerification(params);
+    const response = await cadastroApi(params);
 
     if (!response) {
       alert('Usuario não cadastrado');
     } else {
-      localStorage.setItem('idUsuario', response.id_usuario);
-      navigate('/home');
+      navigate('/');
     }
   }
 
@@ -47,7 +46,7 @@ export function Login() {
           borderRadius: 20,
         }}
       >
-        <h1 style={{ color: '#fff' }}>Login</h1>
+        <h1 style={{ color: '#fff' }}>Cadastro</h1>
         <div
           style={{
             display: 'flex',
@@ -85,13 +84,6 @@ export function Login() {
             style={{ width: 300 }}
           >
             Entrar
-          </Button>
-          <Button
-            onClick={() => navigate('/cadastro')}
-            appearance="default"
-            style={{ width: 300 }}
-          >
-            Cadastrar
           </Button>
         </div>
       </div>

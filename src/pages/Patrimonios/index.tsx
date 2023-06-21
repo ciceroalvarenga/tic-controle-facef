@@ -4,6 +4,7 @@ import {
   patrimoniosDelete,
   patrimoniosGet,
   patrimoniosPost,
+  patrimoniosPut,
 } from '../../services/Patrimonios';
 import { tipopatrimonioGet } from '../../services/TiposPatrimonios';
 import { localizacoesGet } from '../../services/Localizacoes';
@@ -56,6 +57,7 @@ export function Patrimonios() {
   const [codigo, setCodigo] = useState('');
   const [nome, setNome] = useState('');
   const [quantidade, setQuantidade] = useState('');
+  const [codigoPatrimonioEdit, setCodigoPatrimonioEdit] = useState(0);
 
   const [openModalCriar, setOpenModalCriar] = useState(false);
   const [openModalEditar, setOpenModalEditar] = useState(false);
@@ -65,7 +67,10 @@ export function Patrimonios() {
   const handleClose = () => setOpenModalCriar(false);
 
   //modal editar
-  const handleOpenModalEditar = () => setOpenModalEditar(true);
+  const handleOpenModalEditar = (codPatrimonio: number) => {
+    setOpenModalEditar(true);
+    setCodigoPatrimonioEdit(codPatrimonio);
+  };
   const handleCloseModalEditar = () => setOpenModalEditar(false);
 
   useEffect(() => {
@@ -75,10 +80,15 @@ export function Patrimonios() {
   }, [patrimonios]);
 
   async function loadApiData() {
-    const response = await patrimoniosGet();
+    const idUsuario = localStorage.getItem('idUsuario');
 
-    setPatrimonios(response);
+    if (idUsuario) {
+      const response = await patrimoniosGet(Number(idUsuario));
+
+      setPatrimonios(response);
+    }
   }
+
   async function loadApiDataTipo() {
     const response = await tipopatrimonioGet();
 
@@ -100,13 +110,15 @@ export function Patrimonios() {
   };
 
   async function handlePost() {
+    const idUsuario = localStorage.getItem('idUsuario');
+
     const params = {
       cod_patrimonio: codigo,
       tipo_patrimonio: selectedId,
       nome_patrimonio: nome,
       qtde: quantidade,
       localizacao: selectedIdLocal,
-      id_usuario: 1,
+      id_usuario: Number(idUsuario),
     };
 
     const response = await patrimoniosPost(params);
@@ -114,6 +126,28 @@ export function Patrimonios() {
     //@ts-ignore
     if (response.status === 200) {
       setOpenModalCriar(false);
+    }
+  }
+
+  async function handlePut() {
+    const idUsuario = localStorage.getItem('idUsuario');
+
+    const params = {
+      cod_patrimonio: codigoPatrimonioEdit,
+      tipo_patrimonio: selectedId,
+      nome_patrimonio: nome,
+      qtde: quantidade,
+      localizacao: selectedIdLocal,
+      id_usuario: Number(idUsuario),
+    };
+
+    const response = await patrimoniosPut(params);
+
+    console.log('response', response);
+
+    //@ts-ignore
+    if (response.status === 200) {
+      setOpenModalEditar(false);
     }
   }
 
@@ -180,17 +214,36 @@ export function Patrimonios() {
         <Modal.Body
           style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
         >
-          <Input placeholder="Código Patrimonio" />
-          <Input placeholder="Tipo Patrimonio" />
-          <Input placeholder="Nome" />
-          <Input placeholder="Quantidade" />
-          <Input placeholder="Localização" />
+          <SelectPicker
+            data={tipo}
+            value={selectedId}
+            onChange={handleSelectChange}
+            labelKey="nome"
+            valueKey="id_tipo"
+            placeholder="Tipo Patrimonio"
+            style={{ width: 224 }}
+          />
+          <Input placeholder="Nome" onChange={(e) => setNome(e)} />
+          <Input
+            type="number"
+            placeholder="Quantidade"
+            onChange={(e) => setQuantidade(e)}
+          />
+          <SelectPicker
+            data={localizacao}
+            value={selectedIdLocal}
+            onChange={handleSelectChangeLocal}
+            labelKey="sala"
+            valueKey="id_localizacao"
+            placeholder="Localização"
+            style={{ width: 224 }}
+          />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={handlePut} appearance="primary">
             Confirmar
           </Button>
-          <Button onClick={handleClose} appearance="ghost">
+          <Button onClick={handleCloseModalEditar} appearance="ghost">
             Cancelar
           </Button>
         </Modal.Footer>
@@ -200,9 +253,9 @@ export function Patrimonios() {
         <Table
           height={400}
           data={patrimonios}
-          onRowClick={(rowData) => {
-            console.log(rowData);
-          }}
+          // onRowClick={(rowData) => {
+          //   console.log(rowData);
+          // }}
         >
           <Column width={80} align="center" fixed>
             <HeaderCell>Código</HeaderCell>
@@ -232,7 +285,10 @@ export function Patrimonios() {
 
             <Cell style={{ padding: '6px' }}>
               {(rowData) => (
-                <Button appearance="link" onClick={handleOpenModalEditar}>
+                <Button
+                  appearance="link"
+                  onClick={() => handleOpenModalEditar(rowData.cod_patrimonio)}
+                >
                   Editar
                 </Button>
               )}

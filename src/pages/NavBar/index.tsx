@@ -6,7 +6,7 @@ export function NavBarPage() {
   return (
     <Navbar>
       <Nav>
-        <Nav.Item onClick={() => navigate('/')}>Home</Nav.Item>
+        <Nav.Item onClick={() => navigate('/home')}>Home</Nav.Item>
         <Nav.Item onClick={() => navigate('/patrimonios')}>
           Patrimonios
         </Nav.Item>
