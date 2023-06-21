@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Table, Button, Modal, Input, SelectPicker } from 'rsuite';
-import { localizacoesDelete, localizacoesGet, localizacoesPost } from '../../services/Localizacoes';
-
+import { localizacoesDelete, localizacoesGet, localizacoesPost, localizacoesPut } from '../../services/Localizacoes';
+import { useNavigate } from 'react-router-dom';
+import { Navbar, Nav } from 'rsuite';
 const { Column, HeaderCell, Cell } = Table;
 
 interface ILocalizacoes {
@@ -11,6 +12,7 @@ interface ILocalizacoes {
 }
 
 export function Localizacao() {
+  const navigate = useNavigate();
   const [localizacoes, setLocalizacoes] = useState<ILocalizacoes[]>([]);
   //modal
   const [openModalCriar, setOpenModalCriar] = useState(false);
@@ -21,12 +23,17 @@ export function Localizacao() {
   const handleClose = () => setOpenModalCriar(false);
 
   //modal editar
-  const handleOpenModalEditar = () => setOpenModalEditar(true);
   const handleCloseModalEditar = () => setOpenModalEditar(false);
+
+  const handleOpenModalEditar = (codManutencao: number) => {
+    setOpenModalEditar(true);
+    setCodEditar(codManutencao);
+  }
 
   //informações
   const [sala, setSala] = useState('');
   const [prateleira, setPrateleira] = useState('');
+  const [codEditar, setCodEditar] = useState(0);
 
   useEffect(() => {
     loadApiData();
@@ -39,6 +46,10 @@ export function Localizacao() {
   }
 
   async function handlePost() {
+    if(!sala || !prateleira){
+      alert('Preencha todas as informações');
+      return ""
+    }
     const params = {
       sala: sala,
       prateleira: prateleira
@@ -52,6 +63,22 @@ export function Localizacao() {
     }
   }
 
+  async function handlePut() {
+    if(!sala || !prateleira){
+      alert('Preencha todas as informações');
+      return ""
+    }
+    const params = {
+      id_localizacao: codEditar,
+      sala: sala,
+      prateleira: prateleira
+    };
+
+    const response = await localizacoesPut(params);
+
+    setOpenModalEditar(false);
+  }
+
   return (
 
     <div
@@ -59,6 +86,22 @@ export function Localizacao() {
         padding: 10,
       }}
     >
+      <Navbar>
+        <Nav>
+          <Nav.Item onClick={() => navigate('/home')}>Home</Nav.Item>
+          <Nav.Item onClick={() => navigate('/patrimonios')}>
+            Patrimonios
+          </Nav.Item>
+          <Nav.Item onClick={() => navigate('/manutencao')}>Manutenções</Nav.Item>
+          <Nav.Item onClick={() => navigate('/tipopatrimonio')}>
+            Tipos de Patrimonios
+          </Nav.Item>
+          <Nav.Item onClick={() => navigate('/localizacao')}>
+            Localizações
+          </Nav.Item>
+        </Nav>
+      </Navbar>
+      
       <Modal open={openModalCriar} onClose={handleClose}>
         <Modal.Header>
           <Modal.Title>Criar Localização</Modal.Title>
@@ -89,14 +132,14 @@ export function Localizacao() {
         <Modal.Body
           style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
         >
-          <Input placeholder="Sala" />
-          <Input placeholder="Prateleira" />
+          <Input placeholder="Sala" onChange={(e) => setSala(e)} />
+          <Input placeholder="Prateleira" onChange={(e) => setPrateleira(e)} />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={handlePut} appearance="primary">
             Confirmar
           </Button>
-          <Button onClick={handleClose} appearance="ghost">
+          <Button onClick={handleCloseModalEditar} appearance="ghost">
             Cancelar
           </Button>
         </Modal.Footer>
@@ -130,7 +173,7 @@ export function Localizacao() {
               {(rowData) => (
                 <Button
                   appearance="link"
-                  onClick={handleOpenModalEditar}
+                  onClick={() => handleOpenModalEditar(rowData.id_localizacao)}
                 >
                   Editar
                 </Button>

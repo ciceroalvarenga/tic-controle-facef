@@ -8,6 +8,8 @@ import {
 } from '../../services/Patrimonios';
 import { tipopatrimonioGet } from '../../services/TiposPatrimonios';
 import { localizacoesGet } from '../../services/Localizacoes';
+import { useNavigate } from 'react-router-dom';
+import { Navbar, Nav } from 'rsuite';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -39,6 +41,7 @@ interface ILocalizacoes {
 }
 
 export function Patrimonios() {
+  const navigate = useNavigate();
   //get
   const [patrimonios, setPatrimonios] = useState<IPatrimonios[]>([]);
 
@@ -110,7 +113,15 @@ export function Patrimonios() {
   };
 
   async function handlePost() {
+    if(!selectedId || !codigoPatrimonioEdit || !nome || !quantidade || !selectedIdLocal){
+      alert('Preencha todas as informações');
+      return ""
+    }
     const idUsuario = localStorage.getItem('idUsuario');
+    if(!idUsuario ){
+      alert('Faça login');
+      return ""
+    }
 
     const params = {
       cod_patrimonio: codigo,
@@ -130,8 +141,15 @@ export function Patrimonios() {
   }
 
   async function handlePut() {
+    if(!selectedId || !codigoPatrimonioEdit || !nome || !quantidade || !selectedIdLocal){
+      alert('Preencha todas as informações');
+      return ""
+    }
     const idUsuario = localStorage.getItem('idUsuario');
-
+    if(!idUsuario ){
+      alert('Faça login');
+      return ""
+    }
     const params = {
       cod_patrimonio: codigoPatrimonioEdit,
       tipo_patrimonio: selectedId,
@@ -157,6 +175,21 @@ export function Patrimonios() {
         padding: 10,
       }}
     >
+       <Navbar>
+        <Nav>
+          <Nav.Item onClick={() => navigate('/home')}>Home</Nav.Item>
+          <Nav.Item onClick={() => navigate('/patrimonios')}>
+            Patrimonios
+          </Nav.Item>
+          <Nav.Item onClick={() => navigate('/manutencao')}>Manutenções</Nav.Item>
+          <Nav.Item onClick={() => navigate('/tipopatrimonio')}>
+            Tipos de Patrimonios
+          </Nav.Item>
+          <Nav.Item onClick={() => navigate('/localizacao')}>
+            Localizações
+          </Nav.Item>
+        </Nav>
+      </Navbar>
       {/* Modal Criar */}
       <Modal open={openModalCriar} onClose={handleClose}>
         <Modal.Header>

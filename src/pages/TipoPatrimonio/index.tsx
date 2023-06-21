@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Table, Button, Modal, Input } from 'rsuite';
-import { tipopatrimonioDelete, tipopatrimonioGet, tipopatrimonioPost } from '../../services/TiposPatrimonios';
+import { tipopatrimonioDelete, tipopatrimonioGet, tipopatrimonioPost, tipopatrimonioPut } from '../../services/TiposPatrimonios';
+import { useNavigate } from 'react-router-dom';
+import { Navbar, Nav } from 'rsuite';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -11,6 +13,8 @@ interface ITipoPatrimonio {
 }
 
 export function TipoPatrimonio() {
+  const navigate = useNavigate();
+
   const [tipopatrimonio, setTipoPatrimonio] = useState<ITipoPatrimonio[]>([]);
    //modal
    const [openModalCriar, setOpenModalCriar] = useState(false);
@@ -21,12 +25,17 @@ export function TipoPatrimonio() {
    const handleClose = () => setOpenModalCriar(false);
  
    //modal editar
-   const handleOpenModalEditar = () => setOpenModalEditar(true);
    const handleCloseModalEditar = () => setOpenModalEditar(false);
+
+   const handleOpenModalEditar = (codManutencao: number) => {
+     setCodEditar(codManutencao)
+     setOpenModalEditar(true);
+   } 
  
    //informações
    const [nome, setNome] = useState('');
    const [categoria, setCategoria] = useState('');
+   const [codEditar, setCodEditar] = useState(0);
  
 
   useEffect(() => {
@@ -40,6 +49,10 @@ export function TipoPatrimonio() {
   }
 
   async function handlePost() {
+    if(!nome || !categoria){
+      alert('Preencha todas as informações');
+      return ""
+    }
     const params = {
       nome: nome,
       categoria: categoria
@@ -54,12 +67,44 @@ export function TipoPatrimonio() {
     }
   }
 
+  async function handlePut() {
+    if(!nome || !categoria){
+      alert('Preencha todas as informações');
+      return ""
+    }
+    const params = {
+      id_tipo: codEditar,
+      nome: nome,
+      categoria: categoria
+    };
+
+    const response = await tipopatrimonioPut(params);
+
+    setOpenModalCriar(false);
+
+  }
+
   return (
     <div
       style={{
         padding: 10,
       }}
     >
+       <Navbar>
+        <Nav>
+          <Nav.Item onClick={() => navigate('/home')}>Home</Nav.Item>
+          <Nav.Item onClick={() => navigate('/patrimonios')}>
+            Patrimonios
+          </Nav.Item>
+          <Nav.Item onClick={() => navigate('/manutencao')}>Manutenções</Nav.Item>
+          <Nav.Item onClick={() => navigate('/tipopatrimonio')}>
+            Tipos de Patrimonios
+          </Nav.Item>
+          <Nav.Item onClick={() => navigate('/localizacao')}>
+            Localizações
+          </Nav.Item>
+        </Nav>
+      </Navbar>
       <Modal open={openModalCriar} onClose={handleClose}>
         <Modal.Header>
           <Modal.Title>Criar Tipo Patrimonio</Modal.Title>
@@ -67,7 +112,7 @@ export function TipoPatrimonio() {
         <Modal.Body
           style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
         >
-          <Input placeholder="Nome" onChange={(e) => setNome(e)} />
+          <Input  placeholder="Nome" onChange={(e) => setNome(e)} />
           <Input placeholder="Categoria" onChange={(e) => setCategoria(e)} />
 
         </Modal.Body>
@@ -90,14 +135,14 @@ export function TipoPatrimonio() {
         <Modal.Body
           style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
         >
-          <Input placeholder="Nome" />
-          <Input placeholder="Categoria" />
+          <Input placeholder="Nome" onChange={(e) => setNome(e)} />
+          <Input placeholder="Categoria" onChange={(e) => setCategoria(e)} />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleClose} appearance="primary">
+          <Button onClick={handlePut} appearance="primary">
             Confirmar
           </Button>
-          <Button onClick={handleClose} appearance="ghost">
+          <Button onClick={handleCloseModalEditar} appearance="ghost">
             Cancelar
           </Button>
         </Modal.Footer>
@@ -132,7 +177,7 @@ export function TipoPatrimonio() {
               {(rowData) => (
                 <Button
                 appearance="link"
-                onClick={handleOpenModalEditar}
+                onClick={() => handleOpenModalEditar(rowData.id_tipo)}
                 >
                   Editar
                 </Button>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button, Input } from 'rsuite';
 import { useNavigate } from 'react-router-dom';
 import { cadastroApi } from '../../services/Login';
+import { error } from 'console';
 
 export function Cadastro() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,10 @@ export function Cadastro() {
   const navigate = useNavigate();
 
   async function handleLogin() {
+    if(!email || !senha){
+      alert('Usuario não cadastrado');
+      return ""
+    }
     const params = {
       email,
       senha,
@@ -83,7 +88,7 @@ export function Cadastro() {
             appearance="primary"
             style={{ width: 300 }}
           >
-            Entrar
+            Cadastrar
           </Button>
         </div>
       </div>

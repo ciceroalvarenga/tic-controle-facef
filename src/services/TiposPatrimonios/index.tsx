@@ -10,7 +10,7 @@ async function tipopatrimonioGet() {
 
   return result;
 }
-async function tipopatrimonioPut(id: number, params: any) {
+async function tipopatrimonioPut(params: any) {
   const result = await api
     .put(`/tipopatrimonio`, params)
     .then((res) => {

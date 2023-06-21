@@ -10,6 +10,10 @@ export function Login() {
   const navigate = useNavigate();
 
   async function handleLogin() {
+    if(!email || !senha){
+      alert('Usuario não cadastrado');
+      return ""
+    }
     const params = {
       email,
       senha,

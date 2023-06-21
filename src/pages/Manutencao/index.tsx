@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Table, Button, Modal, Input, SelectPicker } from 'rsuite';
 import { manutencoesDelete, manutencoesGet, manutencoesPost, manutencoesPut } from '../../services/Manutencoes';
 import { patrimoniosGet } from '../../services/Patrimonios';
+import { useNavigate } from 'react-router-dom';
+import { Navbar, Nav } from 'rsuite';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -42,6 +44,8 @@ interface IPatrimonios {
 }
 
 export function Manutencao() {
+  const navigate = useNavigate();
+
   const [manutencoes, setManutencoes] = useState<IManutencoes[]>([]);
   const [patrimonios, setPatrimonios] = useState<IPatrimonios[]>([]);
 
@@ -89,6 +93,10 @@ export function Manutencao() {
   };
 
   async function handlePost() {
+    if(!selectedId || !cod || !data){
+      alert('Preencha todas as informações');
+      return ""
+    }
     const params = {
       cod_manutencao: cod,
       cod_patrimonio: selectedId,
@@ -105,20 +113,20 @@ export function Manutencao() {
   }
 
   async function handlePut() {
-    console.log(codEditar)
+    if(!selectedId || !codEditar || !data){
+      alert('Preencha todas as informações');
+      return ""
+    }
     const params = {
       cod_manutencao: codEditar,
       cod_patrimonio: selectedId,
       data_manutencao: data
     };
-    console.log(params)
 
     const response = await manutencoesPut(params);
 
-    //@ts-ignore
-    if (response.status === 200) {
-      setOpenModalCriar(false);
-    }
+    setOpenModalCriar(false);
+
   }
 
   return (
@@ -127,6 +135,21 @@ export function Manutencao() {
         padding: 10,
       }}
     >
+       <Navbar>
+        <Nav>
+          <Nav.Item onClick={() => navigate('/home')}>Home</Nav.Item>
+          <Nav.Item onClick={() => navigate('/patrimonios')}>
+            Patrimonios
+          </Nav.Item>
+          <Nav.Item onClick={() => navigate('/manutencao')}>Manutenções</Nav.Item>
+          <Nav.Item onClick={() => navigate('/tipopatrimonio')}>
+            Tipos de Patrimonios
+          </Nav.Item>
+          <Nav.Item onClick={() => navigate('/localizacao')}>
+            Localizações
+          </Nav.Item>
+        </Nav>
+      </Navbar>
       <Modal open={openModalCriar} onClose={handleClose}>
         <Modal.Header>
           <Modal.Title>Criar Manutenção</Modal.Title>
@@ -166,7 +189,6 @@ export function Manutencao() {
         <Modal.Body
           style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
         >
-          <Input placeholder="Código Manutencao" type="number" onChange={(e) => setCod(e)} />
           <SelectPicker
             data={patrimonios}
             value={selectedId}

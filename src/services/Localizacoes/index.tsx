@@ -10,9 +10,9 @@ async function localizacoesGet() {
 
   return result;
 }
-async function localizacoesPut(id: number, params: any) {
+async function localizacoesPut(params: any) {
   const result = await api
-    .get(`/localizacao/${id}`, params)
+    .put(`/localizacao`, params)
     .then((res) => {
       return res.data;
     })
