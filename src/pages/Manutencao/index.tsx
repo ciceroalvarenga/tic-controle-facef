@@ -77,7 +77,9 @@ export function Manutencao() {
     setManutencoes(response);
   }
   async function loadApiDataPatrimonios() {
-    const response = await patrimoniosGet();
+    const idUsuario = localStorage.getItem('idUsuario');
+
+    const response = await patrimoniosGet(Number(idUsuario));
 
     setPatrimonios(response);
   }
