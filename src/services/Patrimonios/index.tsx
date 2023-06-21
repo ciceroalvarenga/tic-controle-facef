@@ -1,8 +1,8 @@
 import { api } from '../api';
 
-async function patrimoniosGet() {
+async function patrimoniosGet(id: number) {
   const result = await api
-    .get('/patrimonio')
+    .get(`/patrimonio/usuario/${id}`)
     .then((res) => {
       return res.data;
     })
@@ -11,11 +11,11 @@ async function patrimoniosGet() {
   return result;
 }
 
-async function patrimoniosPut(id: number, params: any) {
+async function patrimoniosPut(params: any) {
   const result = await api
-    .get(`/patrimonio/${id}`, params)
+    .put(`/patrimonio`, params)
     .then((res) => {
-      return res.data;
+      return res;
     })
     .catch((err) => console.log(err));
 
