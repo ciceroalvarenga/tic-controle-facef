@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Table, Button } from 'rsuite';
-import { tipopatrimonioDelete, tipopatrimonioGet } from '../../services/TiposPatrimonios';
+import { Table, Button, Modal, Input } from 'rsuite';
+import { tipopatrimonioDelete, tipopatrimonioGet, tipopatrimonioPost } from '../../services/TiposPatrimonios';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -12,6 +12,22 @@ interface ITipoPatrimonio {
 
 export function TipoPatrimonio() {
   const [tipopatrimonio, setTipoPatrimonio] = useState<ITipoPatrimonio[]>([]);
+   //modal
+   const [openModalCriar, setOpenModalCriar] = useState(false);
+   const [openModalEditar, setOpenModalEditar] = useState(false);
+ 
+   //modal criar
+   const handleOpen = () => setOpenModalCriar(true);
+   const handleClose = () => setOpenModalCriar(false);
+ 
+   //modal editar
+   const handleOpenModalEditar = () => setOpenModalEditar(true);
+   const handleCloseModalEditar = () => setOpenModalEditar(false);
+ 
+   //informações
+   const [nome, setNome] = useState('');
+   const [categoria, setCategoria] = useState('');
+ 
 
   useEffect(() => {
     loadApiData();
@@ -23,12 +39,69 @@ export function TipoPatrimonio() {
     setTipoPatrimonio(response);
   }
 
+  async function handlePost() {
+    const params = {
+      nome: nome,
+      categoria: categoria
+    };
+    console.log(params)
+
+    const response = await tipopatrimonioPost(params);
+
+    //@ts-ignore
+    if (response.status === 200) {
+      setOpenModalCriar(false);
+    }
+  }
+
   return (
     <div
       style={{
         padding: 10,
       }}
     >
+      <Modal open={openModalCriar} onClose={handleClose}>
+        <Modal.Header>
+          <Modal.Title>Criar Tipo Patrimonio</Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+        >
+          <Input placeholder="Nome" onChange={(e) => setNome(e)} />
+          <Input placeholder="Categoria" onChange={(e) => setCategoria(e)} />
+
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handlePost} appearance="primary">
+            Confirmar
+          </Button>
+          <Button onClick={handleClose} appearance="ghost">
+            Cancelar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal Editar */}
+
+      <Modal open={openModalEditar} onClose={handleCloseModalEditar}>
+        <Modal.Header>
+          <Modal.Title>Editar Tipo Patrimonio</Modal.Title>
+        </Modal.Header>
+        <Modal.Body
+          style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+        >
+          <Input placeholder="Nome" />
+          <Input placeholder="Categoria" />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleClose} appearance="primary">
+            Confirmar
+          </Button>
+          <Button onClick={handleClose} appearance="ghost">
+            Cancelar
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <div>
         <Table
           height={400}
@@ -58,8 +131,8 @@ export function TipoPatrimonio() {
             <Cell style={{ padding: '6px' }}>
               {(rowData) => (
                 <Button
-                  appearance="link"
-                  onClick={() => alert(`id:${rowData.id_tipo}`)}
+                appearance="link"
+                onClick={handleOpenModalEditar}
                 >
                   Editar
                 </Button>
@@ -83,7 +156,7 @@ export function TipoPatrimonio() {
         </Table>
       </div>
 
-      <Button>Criar Novo</Button>
+      <Button appearance="primary" onClick={handleOpen}>Criar Novo</Button>
     </div>
   );
 }

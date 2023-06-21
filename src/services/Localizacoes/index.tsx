@@ -10,6 +10,27 @@ async function localizacoesGet() {
 
   return result;
 }
+async function localizacoesPut(id: number, params: any) {
+  const result = await api
+    .get(`/localizacao/${id}`, params)
+    .then((res) => {
+      return res.data;
+    })
+    .catch((err) => console.log(err));
+
+  return result;
+}
+
+async function localizacoesPost(params: any) {
+  const result = await api
+    .post(`/localizacao`, params)
+    .then((res) => {
+      return res;
+    })
+    .catch((err) => console.log(err));
+
+  return result;
+}
 
 async function localizacoesDelete(id: number) {
   const result = await api
@@ -22,4 +43,4 @@ async function localizacoesDelete(id: number) {
   return result;
 }
 
-export { localizacoesGet, localizacoesDelete };
+export { localizacoesGet, localizacoesDelete, localizacoesPost, localizacoesPut };
